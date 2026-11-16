@@ -161,29 +161,6 @@ function App() {
               </select>
             </div>
 
-            <Card>
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <h2 className="font-semibold">Minha renda</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {salarioNumerico > 0 && horasNumericas > 0
-                      ? `${formatarMoeda(salarioNumerico)} por mês · ${horasNumericas} horas mensais`
-                      : "Configure seu salário e suas horas trabalhadas."}
-                  </p>
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="cursor-pointer"
-                  onClick={() => setDialogAberto(true)}
-                >
-                  {salarioNumerico > 0
-                    ? "Editar informações"
-                    : "Configurar renda"}
-                </Button>
-              </CardContent>
-            </Card>
-
             <div>
               <h2 className="mb-4 text-lg font-semibold">
                 Resumo de {nomeMes}
@@ -241,6 +218,28 @@ function App() {
                 </Card>
               </div>
             </div>
+            <Card>
+              <CardContent className="flex items-center justify-between p-6">
+                <div>
+                  <h2 className="font-semibold">Minha renda</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {salarioNumerico > 0 && horasNumericas > 0
+                      ? `${formatarMoeda(salarioNumerico)} por mês · ${horasNumericas} horas mensais`
+                      : "Configure seu salário e suas horas trabalhadas."}
+                  </p>
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={() => setDialogAberto(true)}
+                >
+                  {salarioNumerico > 0
+                    ? "Editar informações"
+                    : "Configurar renda"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         ) : (
           <Gastos
