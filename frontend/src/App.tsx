@@ -14,6 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+type Despesa = {
+  id: number;
+  nome: string;
+  valor: number;
+  data: string;
+};
+
 function App() {
   const [menuAberto, setMenuAberto] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState<"dashboard" | "gastos">(
@@ -26,7 +33,29 @@ function App() {
 
   const [mesSelecionado, setMesSelecionado] = useState("2026-11");
 
-  const totalGastos = 1850;
+  const [despesas, setDespesas] = useState<Despesa[]>([
+    {
+      id: 1,
+      nome: "Netflix",
+      valor: 39.9,
+      data: "2026-11-05",
+    },
+    {
+      id: 2,
+      nome: "Spotify",
+      valor: 21.9,
+      data: "2026-11-08",
+    },
+  ]);
+
+  const despesasDoMes = despesas.filter(
+    (despesa) => despesa.data.slice(0, 7) === mesSelecionado,
+  );
+
+  const totalGastos = despesasDoMes.reduce(
+    (total, despesa) => total + despesa.valor,
+    0,
+  );
 
   const salarioNumerico = Number(salario);
   const horasNumericas = Number(horasTrabalhadas);
