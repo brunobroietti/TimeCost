@@ -246,6 +246,8 @@ function App() {
           <Gastos
             mesSelecionado={mesSelecionado}
             onChangeMes={setMesSelecionado}
+            despesas={despesas}
+            setDespesas={setDespesas}
           />
         )}
       </main>

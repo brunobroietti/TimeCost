@@ -1,13 +1,14 @@
-
-import { useState, type FormEvent } from "react";
+import {
+  useState,
+  type FormEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -35,17 +36,16 @@ type Despesa = {
 type GastosProps = {
   mesSelecionado: string;
   onChangeMes: (mes: string) => void;
+  despesas: Despesa[];
+  setDespesas: Dispatch<SetStateAction<Despesa[]>>;
 };
 
-function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
-  const [despesas, setDespesas] = useState<Despesa[]>([
-    { id: 1, nome: "Netflix", valor: 39.90, data: "2026-11-05" },
-    { id: 2, nome: "Spotify", valor: 21.90, data: "2026-11-08" },
-    { id: 3, nome: "Amazon Prime", valor: 19.90, data: "2026-11-10" },
-    { id: 4, nome: "Conta de luz", valor: 180, data: "2026-11-12" },
-    { id: 5, nome: "Internet", valor: 120, data: "2026-11-15" },
-    { id: 6, nome: "Outros gastos", valor: 1468.40, data: "2026-11-18" },
-  ]);
+function Gastos({
+  mesSelecionado,
+  onChangeMes,
+  despesas,
+  setDespesas,
+}: GastosProps) {
 
   const [dialogAberto, setDialogAberto] = useState(false);
   const [despesaEditando, setDespesaEditando] = useState<number | null>(null);
@@ -55,12 +55,12 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
   const [data, setData] = useState("");
 
   const despesasDoMes = despesas.filter(
-    (despesa) => despesa.data.slice(0, 7) === mesSelecionado
+    (despesa) => despesa.data.slice(0, 7) === mesSelecionado,
   );
 
   const totalGastos = despesasDoMes.reduce(
     (total, despesa) => total + despesa.valor,
-    0
+    0,
   );
 
   const formatarMoeda = (valor: number) => {
@@ -111,8 +111,8 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
     if (despesaEditando !== null) {
       setDespesas(
         despesas.map((despesa) =>
-          despesa.id === despesaEditando ? novaDespesa : despesa
-        )
+          despesa.id === despesaEditando ? novaDespesa : despesa,
+        ),
       );
     } else {
       setDespesas([...despesas, novaDespesa]);
@@ -122,9 +122,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
   };
 
   const excluirGasto = (id: number) => {
-    const confirmar = window.confirm(
-      "Deseja realmente excluir esta despesa?"
-    );
+    const confirmar = window.confirm("Deseja realmente excluir esta despesa?");
 
     if (confirmar) {
       setDespesas(despesas.filter((despesa) => despesa.id !== id));
@@ -134,10 +132,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex items-center justify-between">
-        <Button
-          className="cursor-pointer"
-          onClick={abrirNovoGasto}
-        >
+        <Button className="cursor-pointer" onClick={abrirNovoGasto}>
           Adicionar gasto
         </Button>
 
@@ -163,9 +158,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
                 <TableHead className="pl-6">Despesa</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Valor</TableHead>
-                <TableHead className="w-24 text-right pr-6">
-                  Ações
-                </TableHead>
+                <TableHead className="w-24 text-right pr-6">Ações</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -177,13 +170,9 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
                       {despesa.nome}
                     </TableCell>
 
-                    <TableCell>
-                      {formatarData(despesa.data)}
-                    </TableCell>
+                    <TableCell>{formatarData(despesa.data)}</TableCell>
 
-                    <TableCell>
-                      {formatarMoeda(despesa.valor)}
-                    </TableCell>
+                    <TableCell>{formatarMoeda(despesa.valor)}</TableCell>
 
                     <TableCell className="pr-6">
                       <div className="flex items-center justify-end gap-1">
@@ -227,9 +216,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
 
       <div className="flex justify-end">
         <div className="w-64 border-t pt-4 text-right">
-          <p className="text-sm text-muted-foreground">
-            Total de gastos
-          </p>
+          <p className="text-sm text-muted-foreground">Total de gastos</p>
           <p className="mt-1 text-2xl font-semibold">
             {formatarMoeda(totalGastos)}
           </p>
@@ -240,9 +227,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {despesaEditando !== null
-                ? "Editar gasto"
-                : "Adicionar gasto"}
+              {despesaEditando !== null ? "Editar gasto" : "Adicionar gasto"}
             </DialogTitle>
 
             <DialogDescription>
@@ -257,7 +242,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
               </label>
               <Input
                 id="nome"
-                placeholder="Ex.: Netflix"
+                placeholder="Ex: Netflix"
                 value={nome}
                 onChange={(event) => setNome(event.target.value)}
                 required
@@ -273,7 +258,7 @@ function Gastos({ mesSelecionado, onChangeMes }: GastosProps) {
                 type="number"
                 min="0.01"
                 step="0.01"
-                placeholder="Ex.: 39,90"
+                placeholder="Ex: 39,90"
                 value={valor}
                 onChange={(event) => setValor(event.target.value)}
                 required
