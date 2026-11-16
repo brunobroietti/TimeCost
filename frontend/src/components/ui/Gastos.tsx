@@ -46,7 +46,6 @@ function Gastos({
   despesas,
   setDespesas,
 }: GastosProps) {
-
   const [dialogAberto, setDialogAberto] = useState(false);
   const [despesaEditando, setDespesaEditando] = useState<number | null>(null);
 
@@ -122,11 +121,7 @@ function Gastos({
   };
 
   const excluirGasto = (id: number) => {
-    const confirmar = window.confirm("Deseja realmente excluir esta despesa?");
-
-    if (confirmar) {
-      setDespesas(despesas.filter((despesa) => despesa.id !== id));
-    }
+    setDespesas(despesas.filter((despesa) => despesa.id !== id));
   };
 
   return (
