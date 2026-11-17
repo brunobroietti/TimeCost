@@ -97,31 +97,91 @@ function Gastos({
     setDialogAberto(true);
   };
 
-  const salvarGasto = (event: FormEvent<HTMLFormElement>) => {
+  const salvarGasto = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const novaDespesa = {
-      id: despesaEditando ?? Date.now(),
-      nome,
-      valor: Number(valor),
-      data,
-    };
+    try {
+      if (despesaEditando !== null) {
+        const resposta = await fetch(
+          `http://localhost:3000/despesas/${despesaEditando}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              nome,
+              valor: Number(valor),
+              data,
+            }),
+          },
+        );
 
-    if (despesaEditando !== null) {
-      setDespesas(
-        despesas.map((despesa) =>
-          despesa.id === despesaEditando ? novaDespesa : despesa,
-        ),
-      );
-    } else {
-      setDespesas([...despesas, novaDespesa]);
+        if (!resposta.ok) {
+          throw new Error("Erro ao editar despesa.");
+        }
+
+        const despesaAtualizada = {
+          id: despesaEditando,
+          nome,
+          valor: Number(valor),
+          data,
+        };
+
+        setDespesas(
+          despesas.map((despesa) =>
+            despesa.id === despesaEditando ? despesaAtualizada : despesa,
+          ),
+        );
+      } else {
+        const resposta = await fetch("http://localhost:3000/despesas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nome,
+            valor: Number(valor),
+            data,
+          }),
+        });
+
+        if (!resposta.ok) {
+          throw new Error("Erro ao cadastrar despesa.");
+        }
+
+        const resultado = await resposta.json();
+
+        const novaDespesa = {
+          id: resultado.id,
+          nome,
+          valor: Number(valor),
+          data,
+        };
+
+        setDespesas([...despesas, novaDespesa]);
+      }
+
+      setDialogAberto(false);
+    } catch (erro) {
+      console.error("Erro ao salvar despesa:", erro);
     }
-
-    setDialogAberto(false);
   };
 
-  const excluirGasto = (id: number) => {
-    setDespesas(despesas.filter((despesa) => despesa.id !== id));
+  const excluirGasto = async (id: number) => {
+    try {
+      const resposta = await fetch(`http://localhost:3000/despesas/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!resposta.ok) {
+        throw new Error("Erro ao excluir despesa.");
+      }
+
+      setDespesas(despesas.filter((despesa) => despesa.id !== id));
+    } catch (erro) {
+      console.error("Erro ao excluir despesa:", erro);
+    }
   };
 
   return (

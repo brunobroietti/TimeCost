@@ -67,16 +67,34 @@ function App() {
     });
   };
 
-  const salvarRenda = (event: FormEvent<HTMLFormElement>) => {
+  const salvarRenda = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (salarioNumerico <= 0 || horasNumericas <= 0) {
       return;
     }
 
-    setDialogAberto(false);
-  };
+    try {
+      const resposta = await fetch("http://localhost:3000/renda", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          salario: salarioNumerico,
+          horas_trabalhadas: horasNumericas,
+        }),
+      });
 
+      if (!resposta.ok) {
+        throw new Error("Erro ao atualizar renda.");
+      }
+
+      setDialogAberto(false);
+    } catch (erro) {
+      console.error("Erro ao atualizar renda:", erro);
+    }
+  };
   const nomeMes = new Date(`${mesSelecionado}-02T12:00:00`).toLocaleDateString(
     "pt-BR",
     {
@@ -109,6 +127,29 @@ function App() {
     };
 
     buscarDespesas();
+  }, []);
+
+  useEffect(() => {
+    const buscarRenda = async () => {
+      try {
+        const resposta = await fetch("http://localhost:3000/renda");
+
+        if (!resposta.ok) {
+          throw new Error("Erro ao buscar renda.");
+        }
+
+        const dados = await resposta.json();
+
+        if (dados.length > 0) {
+          setSalario(String(dados[0].salario));
+          setHorasTrabalhadas(String(dados[0].horas_trabalhadas));
+        }
+      } catch (erro) {
+        console.error("Erro ao buscar renda:", erro);
+      }
+    };
+
+    buscarRenda();
   }, []);
 
   return (

@@ -3,12 +3,14 @@ import express from "express";
 import cors from "cors";
 import { conexao } from "./config/database";
 import despesaRoutes from "./routes/despesaRoutes";
+import rendaRoutes from "./routes/rendaRoutes";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/despesas", despesaRoutes);
+app.use("/renda", rendaRoutes);
 conexao.getConnection()
   .then((connection) => {
     console.log("Conexão com MySQL estabelecida!");
