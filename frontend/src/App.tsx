@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Menu } from "lucide-react";
 import Gastos from "./components/ui/Gastos";
 
@@ -33,20 +33,7 @@ function App() {
 
   const [mesSelecionado, setMesSelecionado] = useState("2026-11");
 
-  const [despesas, setDespesas] = useState<Despesa[]>([
-    {
-      id: 1,
-      nome: "Netflix",
-      valor: 39.9,
-      data: "2026-11-05",
-    },
-    {
-      id: 2,
-      nome: "Spotify",
-      valor: 21.9,
-      data: "2026-11-08",
-    },
-  ]);
+  const [despesas, setDespesas] = useState<Despesa[]>([]);
 
   const despesasDoMes = despesas.filter(
     (despesa) => despesa.data.slice(0, 7) === mesSelecionado,
@@ -97,6 +84,32 @@ function App() {
       year: "numeric",
     },
   );
+
+  useEffect(() => {
+    const buscarDespesas = async () => {
+      try {
+        const resposta = await fetch("http://localhost:3000/despesas");
+
+        if (!resposta.ok) {
+          throw new Error("Erro ao buscar despesas.");
+        }
+
+        const dados = await resposta.json();
+
+        const despesasFormatadas = dados.map((despesa: any) => ({
+          ...despesa,
+          valor: Number(despesa.valor),
+          data: despesa.data.slice(0, 10),
+        }));
+
+        setDespesas(despesasFormatadas);
+      } catch (erro) {
+        console.error("Erro ao buscar despesas:", erro);
+      }
+    };
+
+    buscarDespesas();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
