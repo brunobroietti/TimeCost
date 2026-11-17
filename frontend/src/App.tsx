@@ -30,6 +30,7 @@ function App() {
   const [dialogAberto, setDialogAberto] = useState(false);
   const [salario, setSalario] = useState("");
   const [horasTrabalhadas, setHorasTrabalhadas] = useState("");
+  const [rendaCadastrada, setRendaCadastrada] = useState(false);
 
   const [mesSelecionado, setMesSelecionado] = useState("2026-11");
 
@@ -76,25 +77,28 @@ function App() {
 
     try {
       const resposta = await fetch("http://localhost:3000/renda", {
-        method: "PUT",
+        method: rendaCadastrada ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           salario: salarioNumerico,
           horas_trabalhadas: horasNumericas,
+          mes_referencia: mesSelecionado,
         }),
       });
 
       if (!resposta.ok) {
-        throw new Error("Erro ao atualizar renda.");
+        throw new Error("Erro ao salvar renda.");
       }
 
+      setRendaCadastrada(true);
       setDialogAberto(false);
     } catch (erro) {
-      console.error("Erro ao atualizar renda:", erro);
+      console.error("Erro ao salvar renda:", erro);
     }
   };
+
   const nomeMes = new Date(`${mesSelecionado}-02T12:00:00`).toLocaleDateString(
     "pt-BR",
     {
@@ -132,7 +136,9 @@ function App() {
   useEffect(() => {
     const buscarRenda = async () => {
       try {
-        const resposta = await fetch("http://localhost:3000/renda");
+        const resposta = await fetch(
+          `http://localhost:3000/renda?mes=${mesSelecionado}`,
+        );
 
         if (!resposta.ok) {
           throw new Error("Erro ao buscar renda.");
@@ -143,6 +149,11 @@ function App() {
         if (dados.length > 0) {
           setSalario(String(dados[0].salario));
           setHorasTrabalhadas(String(dados[0].horas_trabalhadas));
+          setRendaCadastrada(true);
+        } else {
+          setSalario("");
+          setHorasTrabalhadas("");
+          setRendaCadastrada(false);
         }
       } catch (erro) {
         console.error("Erro ao buscar renda:", erro);
@@ -150,7 +161,7 @@ function App() {
     };
 
     buscarRenda();
-  }, []);
+  }, [mesSelecionado]);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -206,6 +217,7 @@ function App() {
                 onChange={(event) => setMesSelecionado(event.target.value)}
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
               >
+                <option value="2026-12">Dezembro 2026</option>
                 <option value="2026-11">Novembro 2026</option>
                 <option value="2026-10">Outubro 2026</option>
                 <option value="2026-09">Setembro 2026</option>

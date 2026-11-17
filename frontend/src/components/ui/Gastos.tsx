@@ -78,14 +78,8 @@ function Gastos({
     setNome("");
     setValor("");
 
-    const hoje = new Date();
-    const dataHoje = [
-      hoje.getFullYear(),
-      String(hoje.getMonth() + 1).padStart(2, "0"),
-      String(hoje.getDate()).padStart(2, "0"),
-    ].join("-");
+    setData(`${mesSelecionado}-01`);
 
-    setData(dataHoje);
     setDialogAberto(true);
   };
 
@@ -196,6 +190,7 @@ function Gastos({
           onChange={(event) => onChangeMes(event.target.value)}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
         >
+          <option value="2026-12">Dezembro 2026</option>
           <option value="2026-11">Novembro 2026</option>
           <option value="2026-10">Outubro 2026</option>
           <option value="2026-09">Setembro 2026</option>
